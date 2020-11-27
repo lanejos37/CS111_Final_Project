@@ -84,7 +84,7 @@
 (define (attack_pigman a)
   (if (> (rnd) 0.5)
       (error "you attracted the hoard, and died")
-      (destroy zombie_pigman))
+      (begin (destroy zombie_pigman) (display "Slayed the zombie pigmen horde"))
      
 
  
