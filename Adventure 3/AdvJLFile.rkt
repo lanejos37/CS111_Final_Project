@@ -55,6 +55,21 @@
   #:methods
   (define (inventory c)
     (container-inventory c)))
+    
+ ;; remove!: container thing -> void
+ ;; EFFECT: removes the thing from the container
+ (define (remove! container thing)
+    (set-container-contents! container
+                             (remove thing
+                                     (container-contents container))))
+    
+;; destroy!: thing -> void
+;; EFFECT: removes thing from the game completely.
+(define (destroy! thing)
+  ; We just remove it from its current location
+  ; without adding it anyplace else.
+  (remove! (thing-location thing)
+           thing))
 
  
 ;;One time of container that can always be accessed
@@ -76,7 +91,7 @@
 (define (attack_pigman a)
   (if (> (rnd) 0.5)
       (error "you attracted the hoard, and died")
-      (destroy  
+      (begin (destroy zombie_pigman) (display "Slayed the zombie pigmen horde")))))
      
 
  
