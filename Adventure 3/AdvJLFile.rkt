@@ -37,6 +37,10 @@
 (define cave1
   (make-room "first cave in the cave system you have entered" (list "creeper1" "")))
 
+;;netherportal takes you take nether
+(define netherportal
+  (make-room "netherportal takes you to the nether" (list "zombie_pigman" "")))
+
 ;;initializes the value for current room
 (define currentroom
   home)
@@ -62,7 +66,22 @@
   (make-container "chest with max storage of 10 different objects" (list "axe" "apple" "2 diamonds")))
 
 ;;New struct creeper that is designed to make the player die if thet approach the creeper
-(define-struct (creeper object)
+(define-struct (mobs object)
+  ())
+
+;;New struct for zombie_pigman
+(define-struct (zombie-pigman)
+()
+#:methods
+(define (attack_pigman a)
+  (if (> (rnd) 0.5)
+      (error "you attracted the hoard, and died")
+      (destroy  
+     
+
+ 
+;;New struct creeper that is designed to make the player die if thet approach the creeper
+(define-struct (creeper mobs)
   ()
   #:methods
   (define (approach-creeper c)
