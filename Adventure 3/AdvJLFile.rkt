@@ -19,6 +19,14 @@
     (object-adjectives a))
   (define(objectlist a)
     (type-name-string a)))
+    
+;; destroy!: thing -> void
+;; EFFECT: removes thing from the game completely.
+(define (destroy! thing)
+  ; We just remove it from its current location
+  ; without adding it anyplace else.
+  (remove! (thing-location thing)
+           thing))
 
 
 ;;New "object" called room
@@ -70,13 +78,13 @@
   ())
 
 ;;New struct for zombie_pigman
-(define-struct (zombie-pigman)
+(define-struct (zombie_pigman)
 ()
 #:methods
 (define (attack_pigman a)
   (if (> (rnd) 0.5)
       (error "you attracted the hoard, and died")
-      (destroy  
+      (destroy zombie_pigman))
      
 
  
