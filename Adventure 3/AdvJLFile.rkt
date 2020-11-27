@@ -19,19 +19,11 @@
     (object-adjectives a))
   (define(objectlist a)
     (type-name-string a)))
-    
-;; destroy!: thing -> void
-;; EFFECT: removes thing from the game completely.
-(define (destroy! thing)
-  ; We just remove it from its current location
-  ; without adding it anyplace else.
-  (remove! (thing-location thing)
-           thing))
 
 
 ;;New "object" called room
 (define-struct (room object)
-  (viewroom))
+  (viewroom name))
 
 ;;allows you to view what is in the room/cave
 (define (viewroom)
@@ -39,23 +31,27 @@
 
 ;;room you start in
 (define home
-  (make-room "your own underground home where your adventure begins!" (list "chest" "cave1")))
+  (make-room "your own underground home where your adventure begins!" (list "chest" "cave1") "home"))
 
 ;;cave you can enter
 (define cave1
-  (make-room "first cave in the cave system you have entered" (list "creeper1" "")))
+  (make-room "first cave in the cave system you have entered" (list "creeper1" "netherportal") "cave1"))
 
 ;;netherportal takes you take nether
 (define netherportal
-  (make-room "netherportal takes you to the nether" (list "zombie_pigman" "")))
+  (make-room "netherportal takes you to the nether" (list "zombie_pigman" "") "netherportal"))
 
 ;;initializes the value for current room
 (define currentroom
   home)
 
 ;;updates current room when you enter a new room
+(define (ismember1? str strs) (ormap [lambda (s) (string=? s str)] strs))
+
 (define (enter newroom)
-  (set! currentroom newroom))
+  (if (ismember1? (room-name newroom) (room-viewroom currentroom))
+  (set! currentroom newroom)
+  (display "Cannot enter a non-adjacent room")))
 
 ;;New struct that have iterms within tem
 (define-struct (container object)
@@ -78,13 +74,14 @@
   ())
 
 ;;New struct for zombie_pigman
-(define-struct (zombie_pigman)
+(define-struct (zombie_pigman mobs)
 ()
 #:methods
 (define (attack_pigman a)
-  (if (> (rnd) 0.5)
+  (if (> (2) 0.5)
       (error "you attracted the hoard, and died")
-      (begin (destroy zombie_pigman) (display "Slayed the zombie pigmen horde")))))
+      void)))
+      ;(destroy  
      
 
  
