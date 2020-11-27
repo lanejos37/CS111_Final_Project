@@ -85,7 +85,7 @@
   ())
 
 ;;New struct for zombie_pigman
-(define-struct (zombie-pigman)
+(define-struct (zombie_pigman)
 ()
 #:methods
 (define (attack_pigman a)
