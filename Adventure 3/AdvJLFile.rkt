@@ -93,7 +93,7 @@
   ()
   #:methods
   (define (approach-creeper c)
-    (error "creeper went boom, you are now dead.")))
+    (error "Creeper went boom, you are now dead.")))
 
 ;;creeper in cave1 
 (define creeper1
