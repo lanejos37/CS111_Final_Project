@@ -86,6 +86,18 @@
 ;;New container that should only be accesible when in the room it is in
 (define chest
   (make-container "chest" "chest with max storage of 10 different objects" (list "axe" "apple" "2 diamonds")))
+  
+;for taking something from the chest object and placing it into your player-inventory (code doesn't work)
+(define (pick-up x y)
+  (begin (set! (container-inventory y) (remove x (container-inventory y)))
+        (set! (container-inventory player-inventory) (cons x (container-inventory player-inventory)))
+        (display "You put a new object in your player-inventory")))
+
+;for taking something from the player-inventory object and placing it in the chest object (code doesn't work)
+(define (put-down x y)
+  (begin (set! (container-inventory player-inventory) (remove x (container-inventory player-inventory)))
+         (set! (container-inventory player-inventory)(cons x (container-inventory y)))
+         (display "You have removed an object from your player-inventory")))
 
 ;;New struct creeper that is designed to make the player die if thet approach the creeper
 (define-struct (mobs object)
