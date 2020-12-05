@@ -127,4 +127,3 @@
 
 ;;Notes: Need to make it so that objects and containers are not accesible when in different rooms.
 ;;Also need to get rid of creeper when it exploded.
-;;Finally, if more rooms are added we need to make it so the play can only enter adjacent rooms.
