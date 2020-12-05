@@ -1,9 +1,18 @@
-;; The first three lines of this file were inserted by DrRacket. They record metadata
-;; about the language level of this file in a form that our tools can easily process.
-#reader(lib "htdp-advanced-reader.ss" "lang")((modname adventure) (read-case-sensitive #t) (teachpacks ()) (htdp-settings #(#t constructor repeating-decimal #t #t none #f () #f)))
 (require "adventure-define-struct.rkt")
 (require "macros.rkt")
 (require "utilities.rkt")
+
+;;Code to check if a string is in a list
+(define (ismember1? str strs) (ormap [lambda (s) (string=? s str)] strs))
+
+;; Initial message display at the start of the game
+(display "You are playing minecraft and are going through caves. You are currently in your underground room and are going to explore the cave system you just found next to your place.\nUse the actions procedure to see what actions are possible.")
+
+;; Displays all possible actions in the game
+(define (actions)
+  (display "description takes an object as an input and outputs a description of the object.\n\nviewroom tells you everything within your cave.\n\ninventory will take something that has contents in it such as a chest and return a list of these outputs. No matter what room you are in you can use this function to test your player-inventory.\n\nenter takes a location as an input and allows you to leave one area and enter another.\n\napproach-creeper takes a creeper as an input and allows you to move towards the creeper"))
+
+
 
 ;;;
 ;;; OBJECT
@@ -268,9 +277,6 @@
 
 
 
-
-
-
 ;;;
 ;;; USER COMMANDS
 ;;;
@@ -337,6 +343,30 @@
 (define-user-command (check condition)
   "Throws an exception if condition is false.")
 
+
+(define (start-game)
+  (local [(define home (new-room "your own underground home where your adventure begins!"))
+          (define cave1 (new-room "first cave in the cave system you have entered"))
+          (define netherportal (new-room "netherportal takes you to the nether"))
+          ]
+    (begin (set! me (new-person "" home))
+           (join! home "your own underground home where your adventure begins!"
+                  cave1 "first cave in the cave system you have entered")
+           (new-prop "banana" "its a banana" cave1)
+           (void))))
+
+(define-walkthrough walkthrough
+  (go (the door))
+  (take (the banana))
+  (inventory)
+  (check (have? (the banana)))
+  (go (the door))
+  (drop (the banana))
+  (check (not (have? (the banana))))
+  (look)
+  (inventory)
+  (check (room? (thing-location (the banana)))))
+
 ;;;
 ;;; ADD YOUR COMMANDS HERE!
 ;;;
@@ -347,16 +377,16 @@
 
 ;; start-game: -> void
 ;; Recreate the player object and all the rooms and things.
-(define (start-game)
+;;(define (start-game)
   ;; Fill this in with the rooms you want
-  (local [(define starting-room (new-room ""))]
-    (begin (set! me (new-person "" starting-room))
+  ;;(local [(define starting-room (new-room ""))]
+    ;;(begin (set! me (new-person "" starting-room))
            ;; Add join commands to connect your rooms with doors
 
            ;; Add code here to add things to your rooms
            
-           (check-containers!)
-           (void))))
+           ;;(check-containers!)
+           ;;(void))))
 
 ;;;
 ;;; PUT YOUR WALKTHROUGHS HERE
@@ -566,4 +596,3 @@
 
 (start-game)
 (look)
-
