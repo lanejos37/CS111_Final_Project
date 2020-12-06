@@ -22,7 +22,7 @@
 (define-struct object
   ;; adjectives: (listof string)
   ;; List of adjectives to be printed in the description of this object
-  (adjectives)
+  (adjectives name)
   
   #:methods
   ;; noun: object -> string
@@ -46,7 +46,15 @@
   (define (print-description o)
     (begin (printf (description o))
            (newline)
-           (void))))
+           (void)))
+           
+  ;;gives description of object         
+  (define (description a)
+    (if (ismember1? (object-name a) (room-viewroom currentroom))
+    (object-adjectives a)
+    (display "Cannot observe object that is not in your room")))
+  (define(objectlist a)
+    (type-name-string a)))
 
 ;;;
 ;;; CONTAINER
@@ -278,7 +286,7 @@
 
 
   (define healthbar
-  (make-health "The amount of health you have left, if your health bar reaches zero then you die." 10))
+  (make-health "The amount of health you have left, if your health bar reaches zero then you die." "healthbar" 10))
 
  (define (update-healthbar x)
          (if (< (- (health-number healthbar) x)  0)
@@ -347,10 +355,10 @@
   (begin (destroy a) (update-healthbar 4)))))
   
 (define zombie_pigman1
-  (make-zombie-pigman "Is it a zombie or a pig??"))
+  (make-zombie-pigman "Is it a zombie or a pig??" "zombie_pigman1"))
   
 (define zombie_pigman2
-  (make-zombie-pigman "Is it a zombie or a pig??"))
+  (make-zombie-pigman "Is it a zombie or a pig??" "zombie_pigman_2"))
       
 (define-struct (creeper mobs)
   ()
@@ -359,7 +367,7 @@
     begin (destroy c) (update-healthbar 8)))))
 
 (define creeper1
-  (make-creeper "makes a hissing noice when you come close"))
+  (make-creeper "makes a hissing noice when you come close" "creeper1"))
   
 
 
