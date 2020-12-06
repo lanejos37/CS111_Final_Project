@@ -289,7 +289,53 @@
              
              
              
-             
+
+
+
+;;New "object" called room
+(define-struct (room object)
+  (viewroom))
+
+;;allows you to view what is in the room/cave
+(define (viewroom)
+  (room-viewroom currentroom))
+
+;;room you start in
+(define home
+  (make-room "your own underground home where your adventure begins!" "home" (list "chest" "cave1")))
+
+;;cave you can enter
+(define cave1
+  (make-room "first cave in the cave system you have entered" "cave1" (list "creeper1" "netherportal")))
+
+;;netherportal takes you take nether
+(define netherportal
+  (make-room "netherportal takes you to the nether" "netherportal" (list "zombie_pigman" "")))
+
+;;initializes the value for current room
+(define currentroom
+  home)
+  
+;;Code to check if a string is in a list
+(define (ismember1? str strs) (ormap [lambda (s) (string=? s str)] strs))
+
+;;updates current room when you enter a new room
+(define (enter newroom)
+  (if (ismember1? (object-name newroom) (room-viewroom currentroom))
+  (set! currentroom newroom)
+  (display "Cannot enter a non-adjacent room")))
+
+
+
+
+
+
+
+
+
+
+
+
 
 (define-struct (mobs object)
   ())
