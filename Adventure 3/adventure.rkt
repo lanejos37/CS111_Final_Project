@@ -273,8 +273,21 @@
 ;;; ADD YOUR TYPES HERE!
 ;;;
 
+(define healthbar
+  (make-health "The amount of health you have left, if your health bar reaches zero then you die." 10))
+
+(define (update-healthbar x)
+         (if (= (health-number healthbar)  0)
+             (error "your healthbar has reached zero you are dead")
+             (set! healthbar (make-health "The amount of health you have left, if your health bar reaches zero then you die." 3))))
+
 (define-struct (mobs object)
   ())
+  
+  
+  
+  
+  
   
 (define-struct (zombie_pigman mobs)
 ()
