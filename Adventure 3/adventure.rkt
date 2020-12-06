@@ -45,15 +45,9 @@
   (define (print-description o)
     (begin (printf (description o))
            (newline)
-           (void)))
+           (void))))
            
-  ;;gives description of object         
-  (define (description a)
-    (if (ismember1? (object-name a) (room-viewroom currentroom))
-    (object-adjectives a)
-    (display "Cannot observe object that is not in your room")))
-  (define(objectlist a)
-    (type-name-string a)))
+  
 
 ;;;
 ;;; CONTAINER
