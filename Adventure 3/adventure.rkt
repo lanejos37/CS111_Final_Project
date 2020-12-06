@@ -298,15 +298,13 @@
 ()
 #:methods
 (define (attack_pigman a)
-  (if (> (2) 0.5)
-      (error "you attracted the hoard, and died")
-      (begin (destroy zombie_pigman) (display "Slayed the zombie pigmen horde")))))
+  (begin (destroy a) (update-healthbar 4)))))
       
 (define-struct (creeper mobs)
   ()
   #:methods
-  (define (approach-creeper c)
-    (error "Creeper went boom, you are now dead.")))
+  (define (attack_creeper c)
+    begin (destroy c) (update-healthbar 8)))))
 
 (define creeper1
   (make-creeper "makes a hissing noice when you come close"))
