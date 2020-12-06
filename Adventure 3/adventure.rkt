@@ -363,7 +363,7 @@
 (fly fireballdamage clawdamage))
 
 (define enderdragon
-    (make-enderdragon "The dragon flew and dodged your attack you have inflicted no damage!" 4 2)
+    (make-enderdragon "The dragon flew and dodged your attack you have inflicted no damage!" 4 2))
 
 (define (attack_enderdragon x)
   (if (> rnd 0.5)
