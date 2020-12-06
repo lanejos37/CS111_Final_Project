@@ -9,7 +9,7 @@
 
 ;; Displays all possible actions in the game
 (define (actions)
-  (display "description takes an object as an input and outputs a description of the object.\n\nviewroom tells you everything within your cave.\n\ninventory will take something that has contents in it such as a chest and return a list of these outputs. No matter what room you are in you can use this function to test your player-inventory.\n\nenter takes a location as an input and allows you to leave one area and enter another.\n\napproach-creeper takes a creeper as an input and allows you to move towards the creeper"))
+  (display "descriptions takes an object as an input and outputs a description of the object.\n\nviewroom tells you everything within your cave.\n\ninventory will take something that has contents in it such as a chest and return a list of these outputs. No matter what room you are in you can use this function to test your player-inventory.\n\nenter takes a location as an input and allows you to leave one area and enter another.\n\napproach-creeper takes a creeper as an input and allows you to move towards the creeper"))
 
 
 
@@ -45,7 +45,15 @@
   (define (print-description o)
     (begin (printf (description o))
            (newline)
-           (void))))
+           (void)))
+           
+  ;; descriptions gives a description of an object
+(define (descriptions a)
+    (if (ismember1? (object-name a) (room-viewroom currentroom))
+    (object-adjectives a)
+    (display "Cannot observe object that is not in your room")))
+  (define(objectlist a)
+    (type-name-string a)))
            
   
 
