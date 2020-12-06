@@ -363,20 +363,19 @@
 (fly fireballdamage clawdamage))
 
 (define enderdragon
-    (make-enderdragons "The dragon flew and dodged your attack you have inflicted no damage!" 4 2))
+    (make-enderdragons "the enderdragon from minecraft" "enderdragon" "The dragon flew and dodged your attack you have inflicted no damage!" 4 2))
 
 (define (attack_enderdragon x)
-  (if (> (rnd) 0.5)
-     (dragon-fly)
-     (if (> (rnd) 0.5)
-        (begin (update-healthbar dragon-fireballdamage)
+  (if (> (random) 0.5)
+     (enderdragons-fly enderdragon)
+     (if (> (random) 0.5)
+        (begin (update-healthbar (enderdragons-fireballdamage enderdragon))
                (display "you have taken damage from the dragon's fireball attack"))
-        (if (< (rnd) 0.8)
-               (begin (update-healthbar dragon-clawdamage)
+        (if (< (random) 0.8)
+               (begin (update-healthbar (enderdragons-clawdamage enderdragon))
                (display "you have taken damage from the dragon's claw attack"))
                (begin (destroy! x)
                        (display "you have killed the enderdragon and won the game!"))))))
-        
 
 
 
