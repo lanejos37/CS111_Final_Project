@@ -359,6 +359,31 @@
 (define creeper1
   (make-creeper "makes a hissing noice when you come close" "creeper1"))
   
+(define-struct (enderdragon mobs)
+(fly fireballdamage clawdamage))
+
+(define enderdragon
+    (make-enderdragon "The dragon flew and dodged your attack you have inflicted no damage!" 4 2)
+
+(define (attack_enderdragon x)
+  (if (> rnd 0.5)
+     (dragon-fly)
+     (if (> rnd 0.5)
+        (begin (update-healthbar fireballdamage)
+               (display "you have taken damage from the dragon's fireball attack"))
+        (if (< rnd 0.8)
+               (begin (update-healthbar clawdamage)
+               (display "you have taken damage from the dragon's claw attack"))
+               (begin (destroy! x)
+                       (display "you have killed the enderdragon and won the game!"))))))
+        
+
+
+
+
+
+
+
 
 
 
