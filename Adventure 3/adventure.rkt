@@ -299,6 +299,12 @@
 #:methods
 (define (attack_pigman a)
   (begin (destroy a) (update-healthbar 4)))))
+  
+(define zombie_pigman1
+  (make-zombie-pigman "Is it a zombie or a pig??"))
+  
+(define zombie_pigman2
+  (make-zombie-pigman "Is it a zombie or a pig??"))
       
 (define-struct (creeper mobs)
   ()
@@ -308,6 +314,7 @@
 
 (define creeper1
   (make-creeper "makes a hissing noice when you come close"))
+  
 
 
 
