@@ -2,8 +2,7 @@
 (require "macros.rkt")
 (require "utilities.rkt")
 
-;;Code to check if a string is in a list
-(define (ismember1? str strs) (ormap [lambda (s) (string=? s str)] strs))
+
 
 ;; Initial message display at the start of the game
 (display "You are playing minecraft and are going through caves. You are currently in your underground room and are going to explore the cave system you just found next to your place.\nUse the actions procedure to see what actions are possible.")
@@ -142,9 +141,6 @@
 ;;; ROOM
 ;;; Base type for rooms and outdoor areas
 ;;;
-
-(define-struct (room container)
-  ())
 
 ;; new-room: string -> room
 ;; Makes a new room with the specified adjectives
@@ -352,19 +348,19 @@
 ()
 #:methods
 (define (attack_pigman a)
-  (begin (destroy a) (update-healthbar 4)))))
+  (begin (destroy! a) (update-healthbar 4))))
   
 (define zombie_pigman1
-  (make-zombie-pigman "Is it a zombie or a pig??" "zombie_pigman1"))
+  (make-zombie_pigman "Is it a zombie or a pig??" "zombie_pigman1"))
   
 (define zombie_pigman2
-  (make-zombie-pigman "Is it a zombie or a pig??" "zombie_pigman_2"))
+  (make-zombie_pigman "Is it a zombie or a pig??" "zombie_pigman_2"))
       
 (define-struct (creeper mobs)
   ()
   #:methods
   (define (attack_creeper c)
-    begin (destroy c) (update-healthbar 8)))))
+    (begin (destroy! c) (update-healthbar 8))))
 
 (define creeper1
   (make-creeper "makes a hissing noice when you come close" "creeper1"))
