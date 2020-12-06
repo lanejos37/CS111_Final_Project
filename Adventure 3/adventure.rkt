@@ -273,7 +273,25 @@
 ;;; ADD YOUR TYPES HERE!
 ;;;
 
+(define-struct (mobs object)
+  ())
+  
+(define-struct (zombie_pigman mobs)
+()
+#:methods
+(define (attack_pigman a)
+  (if (> (2) 0.5)
+      (error "you attracted the hoard, and died")
+      (begin (destroy zombie_pigman) (display "Slayed the zombie pigmen horde")))))
+      
+(define-struct (creeper mobs)
+  ()
+  #:methods
+  (define (approach-creeper c)
+    (error "Creeper went boom, you are now dead.")))
 
+(define creeper1
+  (make-creeper "makes a hissing noice when you come close"))
 
 
 
