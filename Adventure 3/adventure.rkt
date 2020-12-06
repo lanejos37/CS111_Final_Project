@@ -310,7 +310,7 @@
 
 ;;netherportal takes you take nether
 (define netherportal
-  (make-room "netherportal takes you to the nether" "netherportal" (list "zombie_pigman" "")))
+  (make-room "netherportal takes you to the nether" "netherportal" (list "zombie_pigman" "zombie_pigman2")))
 
 ;;initializes the value for current room
 (define currentroom
