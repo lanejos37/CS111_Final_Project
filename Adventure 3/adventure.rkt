@@ -306,6 +306,21 @@
 ;;allows you to view what is in the room/cave
 (define (viewroom)
   (room-viewroom currentroom))
+  
+;; new chest object
+(define-struct (chest object)
+  (viewchest))
+  
+;;allows you to view chest in home
+(define (viewchest)
+    (if (ismember1? (object-name home-chest) (room-viewroom currentroom))
+    (chest-viewchest home-chest)
+    (display "Cannot open chest that is not in your room")))
+
+
+;; chest in your room
+(define home-chest
+(make-chest "your safe chest in your home" "home-chest" (list "sword" "banana")))
 
 ;;room you start in
 (define home
