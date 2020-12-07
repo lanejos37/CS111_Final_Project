@@ -323,7 +323,7 @@
 
 ;; chest in your room
 (define home-chest
-(make-chest "your safe chest in your home" "home-chest" (list "sword" "banana")))
+(make-chest "your safe chest in your home" "home-chest" (list "gold sword" "iron helmet" "4x diamonds" "diamond pickaxe" "stone shovel" "64x cobblestone")))
 
 ;;room you start in
 (define home
