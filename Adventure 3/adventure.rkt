@@ -328,11 +328,11 @@
 
 ;;cave you can enter
 (define cave1
-  (make-room "first cave in the cave system you have entered" "cave1" (list "creeper" "home""netherportal""the_end""cave_2")))
+  (make-room "first cave in the cave system you have entered" "cave1" (list "creeper" "home""netherportal""the_end""cave2")))
 
 ;;netherportal takes you take nether
 (define netherportal
-  (make-room "netherportal takes you to the nether" "netherportal" (list "zombie_pigman" "zombie_pigman2""cave_1")))
+  (make-room "netherportal takes you to the nether" "netherportal" (list "zombie_pigman" "zombie_pigman2""cave1")))
 
 ;;the_end were you can win the game
 (define the_end
