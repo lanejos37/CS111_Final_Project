@@ -1,0 +1,1160 @@
+;; The first three lines of this file were inserted by DrRacket. They record metadata
+;; about the language level of this file in a form that our tools can easily process.
+#reader(lib "htdp-advanced-reader.ss" "lang")((modname adventure) (read-case-sensitive #t) (teachpacks ()) (htdp-settings #(#t constructor repeating-decimal #t #t none #f () #f)))
+(require "adventure-define-struct.rkt")
+(require "macros.rkt")
+(require "utilities.rkt")
+
+;;;
+;;; OBJECT
+;;; Base type for all in-game objects
+;;;
+
+(define-struct object
+  ;; adjectives: (listof string)
+  ;; List of adjectives to be printed in the description of this object
+  (adjectives)
+  
+  #:methods
+  ;; noun: object -> string
+  ;; Returns the noun to use to describe this object.
+  (define (noun o)
+    (type-name-string o))
+
+  ;; description-word-list: object -> (listof string)
+  ;; The description of the object as a list of individual
+  ;; words, e.g. '("a" "red" "door").
+  (define (description-word-list o)
+    (add-a-or-an (append (object-adjectives o)
+                         (list (noun o)))))
+  ;; description: object -> string
+  ;; Generates a description of the object as a noun phrase, e.g. "a red door".
+  (define (description o)
+    (words->string (description-word-list o)))
+  
+  ;; print-description: object -> void
+  ;; EFFECT: Prints the description of the object.
+  (define (print-description o)
+    (begin (printf (description o))
+           (newline)
+           (void))))
+
+;;;
+;;; CONTAINER
+;;; Base type for all game objects that can hold things
+;;;
+
+(define-struct (container object)
+  ;; contents: (listof thing)
+  ;; List of things presently in this container
+  (contents)
+  
+  #:methods
+  ;; container-accessible-contents: container -> (listof thing)
+  ;; Returns the objects from the container that would be accessible to the player.
+  ;; By default, this is all the objects.  But if you want to implement locked boxes,
+  ;; rooms without light, etc., you can redefine this to withhold the contents under
+  ;; whatever conditions you like.
+  (define (container-accessible-contents c)
+    (container-contents c))
+  
+  ;; prepare-to-remove!: container thing -> void
+  ;; Called by move when preparing to move thing out of
+  ;; this container.  Normally, this does nothing, but
+  ;; if you want to prevent the object from being moved,
+  ;; you can throw an exception here.
+  (define (prepare-to-remove! container thing)
+    (if (= (length (object-adjectives thing)) 0)
+        (void)
+        (if (string=? (first (object-adjectives thing)) "static")
+            (error "You cannot take this object.")
+            (void))
+        ))
+  
+  ;; prepare-to-add!: container thing -> void
+  ;; Called by move when preparing to move thing into
+  ;; this container.  Normally, this does nothing, but
+  ;; if you want to prevent the object from being moved,
+  ;; you can throw an exception here.
+  (define (prepare-to-add! container thing)
+    (void))
+  
+  ;; remove!: container thing -> void
+  ;; EFFECT: removes the thing from the container
+  (define (remove! container thing)
+    (set-container-contents! container
+                             (remove thing
+                                     (container-contents container))))
+  
+  ;; add!: container thing -> void
+  ;; EFFECT: adds the thing to the container.  Does not update the thing's location.
+  (define (add! container thing)
+    (set-container-contents! container
+                             (cons thing
+                                   (container-contents container))))
+
+  ; create add-prop => add
+
+
+  
+  ;; describe-contents: container -> void
+  ;; EFFECT: prints the contents of the container
+  (define (describe-contents container)
+    (begin (local [(define other-stuff (remove me (container-accessible-contents container)))]
+             (if (empty? other-stuff)
+                 (printf "There's nothing here.~%")
+                 (begin (printf "You see:~%")
+                        (for-each print-description other-stuff))))
+           (void))))
+
+;; move!: thing container -> void
+;; Moves thing from its previous location to container.
+;; EFFECT: updates location field of thing and contents
+;; fields of both the new and old containers.
+(define (move! thing new-container)
+  (begin
+    (prepare-to-remove! (thing-location thing)
+                        thing)
+    (prepare-to-add! new-container thing)
+    (prepare-to-move! thing new-container)
+    (remove! (thing-location thing)
+             thing)
+    (add! new-container thing)
+    (set-thing-location! thing new-container)))
+
+;; destroy!: thing -> void
+;; EFFECT: removes thing from the game completely.
+(define (destroy! thing)
+  ; We just remove it from its current location
+  ; without adding it anyplace else.
+  (remove! (thing-location thing)
+           thing))
+
+;;; addprop!
+;(define (addprop! thing)
+;  ; We just add it to its current location
+;  ; without adding it anyplace else.
+;  (add! (thing-location thing)
+;           thing))
+
+;;;
+;;; ENVIRONMENT
+;;; Base type for rooms and outdoor areas
+;;;
+
+(define-struct (environment container)
+  ())
+
+;; new-environment: string -> environment
+;; Makes a new room with the specified adjectives
+(define (new-environment adjectives)
+  (make-environment (string->words adjectives)
+                    '()))
+
+
+
+
+;;;
+;;; THING
+;;; Base type for all physical objects that can be inside other objects such as rooms
+;;;
+
+(define-struct (thing container)
+  ;; location: container
+  ;; What room or other container this thing is presently located in.
+  (location)
+  
+  #:methods
+  (define (examine thing)
+    (print-description thing))
+
+  ;; prepare-to-move!: thing container -> void
+  ;; Called by move when preparing to move thing into
+  ;; container.  Normally, this does nothing, but
+  ;; if you want to prevent the object from being moved,
+  ;; you can throw an exception here.
+  (define (prepare-to-move! container thing)
+    (void)))
+
+;; initialize-thing!: thing -> void
+;; EFFECT: adds thing to its initial location
+(define (initialize-thing! thing)
+  (add! (thing-location thing)
+        thing))
+
+;; new-thing: string container -> thing
+;; Makes a new thing with the specified adjectives, in the specified location,
+;; and initializes it.
+(define (new-thing adjectives location)
+  (local [(define thing (make-thing (string->words adjectives)
+                                    '() location))]
+    (begin (initialize-thing! thing)
+           thing)))
+
+;;;
+;;; DOOR
+;;; A portal from one room to another
+;;; To join two rooms, you need two door objects, one in each room
+;;;
+
+(define-struct (door thing)
+  ;; destination: container
+  ;; The place this door leads to
+  (destination)
+  
+  #:methods
+  ;; go: door -> void
+  ;; EFFECT: Moves the player to the door's location and (look)s around.
+
+  (define (go door)
+    (begin (move! me (door-destination door))
+           (look))))
+
+
+;; join: room string room string
+;; EFFECT: makes a pair of doors with the specified adjectives
+;; connecting the specified rooms.
+(define (join! room1 adjectives1 room2 adjectives2)
+  (local [(define r1->r2 (make-door (string->words adjectives1)
+                                    '() room1 room2))
+          (define r2->r1 (make-door (string->words adjectives2)
+                                    '() room2 room1))]
+    (begin (initialize-thing! r1->r2)
+           (initialize-thing! r2->r1)
+           (void))))
+
+;;;
+;;; PERSON
+;;; A character in the game.  The player character is a person.
+;;;
+
+(define-struct (person thing)
+  ;; factors that desribe the condition of the person
+  (energy oxygen strength)
+
+  #:methods
+  ;; procedure that increases or decreases the energy of the person
+  (define (change-energy who what)
+    ;    (if (or (< (+ (person-energy who) (food-energy-value what)) 100)
+    ;            (> (+ (person-energy who) (food-energy-value what)) 0))
+    (set-person-energy! who (+ (person-energy who) (food-energy-value what))))
+  ;       (error "You might die if you eat that.")))
+
+  
+  ;; procedure that changes the oxygen level of the person
+  (define (change-oxygen who what)
+    (if (< (person-oxygen who) 100)
+        (set-person-oxygen! who (+ (person-oxygen who) (oxygen-tank-oxygen-value what)))
+        (display-line "Your oxygen level cannot cross 100%.")))
+
+  ; prodecure that changes the strength of the person
+    (define (change-strength who what)
+      (if (< (person-strength who) 100)
+      (set-person-strength! who (+ (person-strength who) (quest-item-power what)))
+      (error "Your strength level is already 100%.")))
+
+  ;; it prints the current state of the person
+  (define (energy-oxygen-strength who)
+    (begin
+      (printf "Your energy level is ~a%. ~n" (person-energy who))
+      (printf "Your oxygen level is ~a%. ~n" (person-oxygen who))
+      (printf "Your strength is ~a%. ~n" (person-strength who))))
+  )
+
+
+;; initialize-person: person -> void
+;; EFFECT: do whatever initializations are necessary for persons.
+(define (initialize-person! p)
+  (initialize-thing! p))
+
+;; new-person: string container -> person
+;; Makes a new person object and initializes it.
+(define (new-person adjectives location)
+  (local [(define person
+            (make-person (string->words adjectives)
+                         '()
+                         location
+                         10
+                         10
+                         10))]
+    (begin (initialize-person! person)
+           person)))
+
+;; This is the global variable that holds the person object representing
+;; the player.  This gets reset by (start-game)
+(define me empty)
+
+;;;
+;;; PROP
+;;; A thing in the game that doesn't serve any purpose other than to be there.
+;;;
+
+(define-struct (prop thing)
+  (;; noun-to-print: string
+   ;; The user can set the noun to print in the description so it doesn't just say "prop"
+   noun-to-print
+   ;; examine-text: string
+   ;; Text to print if the player examines this object
+   examine-text
+   )
+  
+  #:methods
+  (define (noun prop)
+    (prop-noun-to-print prop))
+
+  (define (examine prop)
+    (display-line (prop-examine-text prop))))
+
+;; new-prop: string container -> prop
+;; Makes a new prop with the specified description.
+(define (new-prop description examine-text location)
+  (local [(define words (string->words description))
+          (define noun (last words))
+          (define adjectives (drop-right words 1))
+          (define prop (make-prop adjectives '() location noun examine-text))]
+    (begin (initialize-thing! prop)
+           prop)))
+
+;;;
+;;; ------------------------------ ADD YOUR TYPES HERE! ------------------------------
+;;;
+
+; Room
+(define-struct (room environment)
+  ())
+
+(define (new-room adjectives)
+  (make-room (string->words adjectives)
+             '()))
+
+(define-struct (special-door door)
+  (key)
+
+  #:methods
+  
+  (define (go special-door)
+    (cond [(have? (special-door-key special-door))
+           (begin (move! me (door-destination special-door))
+                  (look))]
+          [else (error "Dangerous zone. You need a key to cross.")])))
+
+
+(define (join-w/key-door! room1 adjectives1 room2 adjectives2 key)
+  (local [(define r1->r2 (make-special-door (string->words adjectives1)
+                                            '() room1 room2
+                                            key))
+          (define r2->r1 (make-special-door (string->words adjectives2)
+                                            '() room2 room1
+                                            key))]
+    (begin (initialize-thing! r1->r2)
+           (initialize-thing! r2->r1)
+           (void))))
+
+
+
+; Magical Creature
+(define-struct (creature person)
+  (vocab))
+
+;(define (new-creature vocab adjectives location)
+;  (local [(define person
+;            (make-creature (string->words adjectives)
+;                          '()
+;                          location
+;                          vocab))]
+;    (begin (initialize-person! person)
+;           person)))
+
+(define (speak-with creature question)
+  (for-each (λ (x)
+              (local [(define coresp
+                        (assoc x
+                               (creature-vocab creature)))]
+                (when (list? coresp)
+                  (display-line (second coresp)))))
+            (string->words question)))
+
+; Mermaid Creature
+(define-struct (mermaid creature)
+  ())
+
+(define (new-mermaid vocab adjectives location)
+  (local [(define mermaid
+            (make-mermaid (string->words adjectives)
+                        '()
+                        location
+                        '()
+                        '()
+                        '()
+                        vocab))]
+    (begin (initialize-person! mermaid)
+           mermaid)))
+
+; Fairy Creature
+(define-struct (fairy creature)
+  ())
+
+(define (new-fairy vocab adjectives location)
+  (local [(define fairy
+            (make-fairy (string->words adjectives)
+                        '()
+                        location
+                        '()
+                        '()
+                        '()
+                        vocab))]
+    (begin (initialize-person! fairy)
+           fairy)))
+
+
+; Cactus
+(define-struct (cactus thing)
+  ()
+
+  #:methods
+  (define (touch cactus)
+    (error "This cactus is poisonus. You are infected. You have 2 minutes left."))
+
+  (define (cut cactus)
+    (new-water '() (here))))
+
+(define (new-cactus location)
+  (local [(define cactus
+            (make-cactus '("static" "tall" "prickly")
+                         '()
+                         location))]
+    (begin (initialize-thing! cactus)
+           cactus)))
+
+
+;; add oasis, to be able to pick up water
+;; if you have water, you can survive the lava
+
+; Food
+(define-struct (food thing)
+  (energy-value))
+
+(define-struct (coconut food)
+  ())
+
+(define (new-coconut location)
+  (local [(define coconut
+            (make-coconut '("ripe")
+                          '()
+                          location
+                          20))]
+    (begin (initialize-thing! coconut)
+           coconut)))
+
+(define (all-food-list)
+  '("coconut" "berries"))
+
+(define (is-a-food? thing)
+  (empty? (filter (λ (x) (is-a? thing x))
+                  (all-food-list))))
+
+(define (eat thing)
+  (if (have? thing)
+      (if (not (is-a-food? thing))
+          (if (or (< (+ (person-energy me) (food-energy-value thing)) 100)
+                  (> (+ (person-energy me) (food-energy-value thing)) 0))
+              (begin
+                (change-energy me thing)
+                (printf "Your energy level has increased to ~a%!" (person-energy me))
+                (destroy! thing))
+              (error "You might die if you eat that."))
+          (error "This item is not food."))
+      (error "Are you sure this is in your inventory?")))
+
+
+; Quest Item
+(define-struct (quest-item thing)
+  (power))
+
+  
+  (define (all-quest-item-list)
+  '("bracelet" "flask"))
+
+  (define (is-a-quest-item? thing)
+    (empty? (filter (λ (x) (is-a? thing x))
+                    (all-quest-item-list))))
+  
+  (define (use thing)
+    (if (have? thing)
+        (if (not (is-a-quest-item? thing))
+            (if (or (< (+ (person-strength me) (quest-item-power thing)) 100)
+                    (> (+ (person-strength me) (quest-item-power thing)) 0))
+                (begin
+                  (change-strength me thing)
+                  (printf "Your strength level has increased to ~a%!" (person-strength me))
+                  (destroy! thing))
+                (error "This quest item will not help you"))
+            (error "This is not a quest item"))
+        (error "You do not have this quest item")))
+       
+
+
+        
+  
+
+
+; Bracelet
+(define-struct (bracelet quest-item)
+  (song))
+
+(define (new-bracelet song power location)
+  (local [(define bracelet
+            (make-bracelet '("pearl")
+                           '()
+                           location
+                           80
+                           '("The Shell Song")
+                           ))]
+    (begin (initialize-thing! bracelet)
+           bracelet)))
+
+(define-struct (shell thing)
+  ()
+
+  #:methods
+  (define (wipe shell)
+    (if (have? shell)
+        (begin
+          (set-object-adjectives! shell '("clean"))
+          (display-line "The shell has a small, barely visible engravement:")
+          (display-line "Sing the shell song."))
+        (error "You do not have the shell."))))
+
+
+
+; Handles the sing command. Upon singing, the player receives a pearl bracelet.
+; The player must have a `clean shell` in order to sing.
+; (player) -> None
+(define (sing-to! thing song)
+  (if (and (string=? (first (object-adjectives thing)) "clean") (string=? song "The Shell Song"))
+      (begin
+        (display-line "Like a shell upon a beach, just another pretty piece, I was difficult to see. But you picked me.")
+        (display-line "The shell is shining. It reveals: ")
+        (new-bracelet song 80 (here))
+        (destroy! thing))
+      (error "Your voice is gone. You are missing something.")))
+
+
+(define (new-shell location)
+  (local [(define shell
+            (make-shell '("dusty")
+                        '()
+                        location))]
+    (begin (initialize-thing! shell)
+           shell)))
+
+
+;;; WATER
+(define-struct (water thing)
+  (molecules))
+
+(define (new-water adjectives location)
+  (local [(define water
+            (make-water '()
+                        '()
+                        location
+                        '()))]
+    (begin (initialize-thing! water)
+           water)))
+
+  
+  ;(define-struct (flower thing))
+  
+
+ ; #:methods
+ ; (define (craft flower)
+ ;   (begin
+ ;     (display-line "You have made a flower wreath")))
+    
+
+(define-struct (mushroom thing)
+  ())
+ 
+  (define (new-mushroom location)
+  (local [(define mushroom
+            (make-mushroom '("magic")
+                           '()
+                           location))]
+    (begin (initialize-thing! mushroom)
+           mushroom)))
+
+
+; Flask
+(define-struct (flask thing)
+  (ingredient)
+
+  #:methods       
+  (define (craft-with flask thing)
+    (if (is-a? thing "mushroom")
+        (if (have? (flask-ingredient flask))
+            (begin
+              (display-line "You have created the Potion of Invincibility")
+              (set-object-adjectives! flask '("Potion of Invincibility"))
+              (destroy! thing))
+            (error "You don't have the ingredients to create a potion"))
+        (error "You can't craft a potion with this.")))
+
+   (define (drink flask)
+    (if (string=? (first (object-adjectives flask)) "Potion of Invincibility")
+        (begin
+          (display-line "You drank the potion of invincibility")
+          (display-line "Your energy and strength has increased")
+          (destroy! flask))
+        (error "You don't have a potion to drink"))))
+
+
+(define (new-flask ingredient location)
+  (local [(define flask
+            (make-flask '("empty potion")
+                           '()
+                           location
+                           ingredient
+                           ))]
+    (begin (initialize-thing! flask)
+           flask)))
+
+
+
+; BUCKET
+(define-struct (bucket thing)
+  (water)
+
+  #:methods
+  (define (fill bucket thing)
+    (if (is-a? thing "water")
+        (if (have? (bucket-water bucket))
+            (begin
+              (display-line "You have filled the bucket with water. You now have a water bucket")
+              (set-object-adjectives! bucket '("water"))
+              (destroy! thing))
+            (error "You have no water to fill the bucket with"))
+        (error "That is not water!"))))
+
+  (define (new-bucket water location)
+  (local [(define bucket
+            (make-bucket '("empty")
+                           '()
+                           location
+                           water))]
+    (begin (initialize-thing! bucket)
+           bucket)))
+
+
+        
+ ;;; OXYGEN CONTAINER
+(define-struct (oxygen-tank thing)
+  (oxygen-value)
+
+  #:methods
+  (define (fill-up oxygen-tank thing)
+    (if (and (have? thing)
+             (have? oxygen-tank))
+        (if (is-a? thing "oxygen")
+            (begin (set-object-adjectives! oxygen-tank '("full"))
+                   (destroy! thing)
+                   (change-oxygen me oxygen-tank))
+            (display-line "You can't fill up the tank with this substance"))
+        (display-line "Are you sure you have everything?"))))
+          
+
+(define (new-oxygen-tank location)
+  (local [(define oxygen-tank
+            (make-oxygen-tank '("empty")
+                              '()
+                              location
+                              80))]
+    (begin (initialize-thing! oxygen-tank)
+           oxygen-tank)))
+
+;;; WATER
+;(define-struct (H2O thing)
+;  ())
+;
+;(define (new-H2O location)
+;  (local [(define H2O
+;            (make-H2O '("molecular")
+;                      '()
+;                      location))]
+;    (begin (initialize-thing! H2O)
+;           H2O)))
+
+
+(define-struct (oxygen water)
+  ())
+ 
+(define (new-oxygen location)
+  (local [(define oxygen
+            (make-oxygen '("molecule of")
+                         '()
+                         location
+                         '()))]
+    (begin (initialize-thing! oxygen)
+           oxygen)))
+
+
+(define (dissociate thing)
+  (if (is-a? thing "water")
+      (if (have? thing)
+          (begin (destroy! thing)
+                 (display-line "You will need this later on:")
+                 (new-oxygen (here)))
+          (error "Are you sure you have that?"))
+      (error "Why are you trying to separate this? Try again.")))
+
+;; LEAF
+
+(define-struct (leaf thing)
+  ()
+  #:methods
+  (define (plant leaf)
+    (display-line "This leaf works as an excellent flag! Congratulations, you are at the peak of your game! You win!")))
+
+(define (new-leaf location)
+  (local [(define leaf
+            (make-leaf '("green")
+                       '()
+                       location
+                       ))]
+    (begin (initialize-thing! leaf)
+           leaf)))
+                      
+
+;; MOUNTAIN
+
+(define-struct (mountain thing)
+  (leaves)
+  #:methods
+  (define (climb mountain)
+    (if (and (have? (mountain-leaves mountain))
+             (> (person-oxygen me) 80))
+        (display-line "You have reached the top of Mt.Everest! Plant your green flag to leave your mark.")
+        (display-line "You need a green object and a full oxygen tank before you climb to the top."))))
+
+
+(define (new-mountain leaves location)
+  (local [(define mountain
+            (make-mountain '("high")
+                           '()
+                           location
+                           leaves
+                           ))]
+    (begin (initialize-thing! mountain)
+           mountain)))
+
+
+;;; LAVA
+;(define-struct (enemy thing)
+;  ())
+;
+;(define-struct (lava thing)
+;  (disenergy)
+;
+;  #:methods
+;  (define (destroy lava)
+;    (if (have? thing)
+;        (if (string=? (first (object-adjectives thing)) "water")
+;            (begin (
+             
+      
+          
+    
+    
+    
+
+
+  
+  ;;;
+  ;;; USER COMMANDS
+  ;;;
+
+  (define (look)
+    (begin (printf "You are in ~A.~%"
+                   (description (here)))
+           (describe-contents (here))
+           (void)))
+
+  (define-user-command (look) "Prints what you can see in the room")
+
+  (define (inventory)
+    (if (empty? (my-inventory))
+        (printf "You don't have anything.~%")
+        (begin (printf "You have:~%")
+               (for-each print-description (my-inventory)))))
+
+  (define-user-command (inventory)
+    "Prints the things you are carrying with you.")
+
+  (define-user-command (examine thing)
+    "Takes a closer look at the thing")
+
+  (define (take thing)
+    (move! thing me))
+
+  (define-user-command (take thing)
+    "Moves thing to your inventory")
+
+  (define (drop thing)
+    (move! thing (here)))
+
+  (define-user-command (drop thing)
+    "Removes thing from your inventory and places it in the room
+")
+
+  (define (put thing container)
+    (move! thing container))
+
+  (define-user-command (put thing container)
+    "Moves the thing from its current location and puts it in the container.")
+
+  (define (help)
+    (for-each (λ (command-info)
+                (begin (display (first command-info))
+                       (newline)
+                       (display (second command-info))
+                       (newline)
+                       (newline)))
+              (all-user-commands)))
+
+  (define-user-command (help)
+    "Displays this help information")
+
+  (define-user-command (go door)
+    "Go through the door to its destination")
+
+  (define (check condition)
+    (if condition
+        (display-line "Check succeeded")
+        (error "Check failed!!!")))
+
+  (define-user-command (check condition)
+    "Throws an exception if condition is false.")
+
+  ;;;
+  ;;; ADD YOUR COMMANDS HERE!
+  ;;;
+
+  ;;;
+  ;;; THE GAME WORLD - FILL ME IN
+  ;;;
+
+  ;; start-game: -> void
+  ;; Recreate the player object and all the rooms and things.
+  (define (start-game)
+    ;; Fill this in with the rooms you want
+    (local [(define starting-env (new-environment "dry desert"))
+            (define sea-env (new-environment "wavy sea"))
+            (define forrest-env (new-environment "fresh forrest"))
+            (define volcano-env (new-environment "burning volcano"))
+            (define mountain-env (new-room "windy Mt. Everest"))
+            (define pyramid-room (new-room "pyramid"))
+            (define shell (new-room "shell"))]
+      (begin (set! me (new-person "" starting-env))
+             ;; Add join commands to connect your rooms with doors
+             (join-w/key-door! starting-env "pyramid" pyramid-room "dry desert"
+                               (new-prop "brick" "It's a heavy brick, reminiscent of the work of the greatest builders of all time."
+                                         sea-env))
+             (join! starting-env "wavy sea" sea-env "dry desert")
+             (join-w/key-door! starting-env "fresh forrest" forrest-env "dry desert"
+                               (new-prop "branch" "It's a mysterious branch from what appears to be an ancient, long-forgotten forrest."
+                                         pyramid-room))
+             (join! forrest-env "volcano" volcano-env "fresh forrest")
+             ;; Add code here to add things to your rooms
+             (new-mermaid '(("fight" "Are you sure? I will kill you.")
+                            ("partner" "I do not have a partner, I am a lone wolf")
+                            ("key" "What is the object you want to enter made of? Think.")
+                            ("do" "Calm down and think. It's all in your head.")
+                            ("lost" "Are you sure? Look around.")
+                            ("where" "We are in the wavy sea environment. The Ancient Egyptians were great sailors and builders.")
+                            ("hint" "That brick looks reminsicent of the work of the greatest builders of all time.")
+                            ("help" "That brick looks reminsicent of the work of the greatest builders of all time.")
+                            )
+                          "magnificent"  sea-env)
+
+             (new-fairy '(("fight" "Are you sure? I will kill you.")
+                             ("partner" "I do not have a partner, I am a lone fairy")
+                             ("who" "I am a fairy, obviously")
+                             ("key" "Try to be like a fairy. Crafty.")
+                             ("do" "That mushroom looks like it could be useful")
+                             ("lost" "One can never be lost. All you need is faith, trust & a little pixie-dust")
+                             ("where" "We are in the fresh forrest environment.")
+                             ("hint" "Only magic can help you survive the next environment.")
+                             ("help" "Those mushrooms look magical.")
+                             )
+                           "mischievous" forrest-env)
+             
+             (new-prop "static sand dune"
+                       "Ouch, it's hot!"
+                       starting-env)
+             ;(new-mushroom forrest-env)
+             (new-bucket (new-water '() sea-env) volcano-env)
+             (new-flask (new-mushroom forrest-env) forrest-env)
+             (new-shell sea-env)
+             (new-mountain (new-leaf forrest-env) mountain-env)
+             (new-cactus starting-env)
+             (new-coconut sea-env)
+             (check-containers!)
+             (void))))
+             
+             
+
+             ;(new-shell '() sea-env)
+             ;(new-bracelet shell)
+             ;(new-cactus starting-env)
+             ;(new-prop "watersss" "this is water" sea-env)
+             ;(new-mushroom forrest-env)
+             ;(new-bucket (new-prop "water" "this is water" sea-env) volcano-env)
+             ;(new-flask (new-prop "mushroom" "a magical mushroom" forrest-env) forrest-env)
+             ;(new-flask (new-mushroom forrest-env) forrest-env)
+            
+             
+
+  ;;;
+  ;;; PUT YOUR WALKTHROUGHS HERE
+  ;;;
+
+  (define-walkthrough win
+    (go (the sea door))
+    (take (the shell))
+    (wipe (the shell))
+    (sing-to! (the shell) "The Shell Song")
+    (take (the bracelet)))
+    
+
+
+    
+    ;(take (the H2O))
+    ;(dissociate (the H2O))
+    ;(take (the oxygen))
+         
+    ;(take (the water))
+  
+;    (speak-with (the mermaid) "help")
+;    (take (the brick))
+;    (go (the desert door))
+;    (go (the pyramid door))
+;    (take (the branch))
+;    (go (the desert door))
+;    (go (the forrest door))
+;    (take (the flask))
+;    (take (the mushroom))
+;    (craft-with (the flask) (the mushroom)))
+  
+    ;(take (the leaf))
+  
+  
+    ;(go (the Mt.Everest door))
+    ;(take (the oxygen-tank)))
+    ;(go (the volcano door))
+    
+
+
+
+
+
+  ;;;
+  ;;; UTILITIES
+  ;;;
+
+  ;; here: -> container
+  ;; The current room the player is in
+  (define (here)
+    (thing-location me))
+
+  ;; stuff-here: -> (listof thing)
+  ;; All the stuff in the room the player is in
+  (define (stuff-here)
+    (container-accessible-contents (here)))
+
+  ;; stuff-here-except-me: -> (listof thing)
+  ;; All the stuff in the room the player is in except the player.
+  (define (stuff-here-except-me)
+    (remove me (stuff-here)))
+
+  ;; my-inventory: -> (listof thing)
+  ;; List of things in the player's pockets.
+  (define (my-inventory)
+    (container-accessible-contents me))
+
+  ;; accessible-objects -> (listof thing)
+  ;; All the objects that should be searched by find and the.
+  (define (accessible-objects)
+    (append (stuff-here-except-me)
+            (my-inventory)))
+
+  ;; have?: thing -> boolean
+  ;; True if the thing is in the player's pocket.
+  (define (have? thing)
+    (eq? (thing-location thing)
+         me))
+
+  ;; have-a?: predicate -> boolean
+  ;; True if the player as something satisfying predicate in their pocket.
+  (define (have-a? predicate)
+    (ormap predicate
+           (container-accessible-contents me)))
+
+  ;; find-the: (listof string) -> object
+  ;; Returns the object from (accessible-objects)
+  ;; whose name contains the specified words.
+  (define (find-the words)
+    (find (λ (o)
+            (andmap (λ (name) (is-a? o name))
+                    words))
+          (accessible-objects)))
+
+  ;; find-within: container (listof string) -> object
+  ;; Like find-the, but searches the contents of the container
+  ;; whose name contains the specified words.
+  (define (find-within container words)
+    (find (λ (o)
+            (andmap (λ (name) (is-a? o name))
+                    words))
+          (container-accessible-contents container)))
+
+  ;; find: (object->boolean) (listof thing) -> object
+  ;; Search list for an object matching predicate.
+  (define (find predicate? list)
+    (local [(define matches
+              (filter predicate? list))]
+      (case (length matches)
+        [(0) (error "There's nothing like that here")]
+        [(1) (first matches)]
+        [else (error "Which one?")])))
+
+  ;; everything: -> (listof container)
+  ;; Returns all the objects reachable from the player in the game
+  ;; world.  So if you create an object that's in a room the player
+  ;; has no door to, it won't appear in this list.
+  (define (everything)
+    (local [(define all-containers '())
+            ; Add container, and then recursively add its contents
+            ; and location and/or destination, as appropriate.
+            (define (walk container)
+              ; Ignore the container if its already in our list
+              (unless (member container all-containers)
+                (begin (set! all-containers
+                             (cons container all-containers))
+                       ; Add its contents
+                       (for-each walk (container-contents container))
+                       ; If it's a door, include its destination
+                       (when (door? container)
+                         (walk (door-destination container)))
+                       ; If  it's a thing, include its location.
+                       (when (thing? container)
+                         (walk (thing-location container))))))]
+      ; Start the recursion with the player
+      (begin (walk me)
+             all-containers)))
+
+  ;; print-everything: -> void
+  ;; Prints all the objects in the game.
+  (define (print-everything)
+    (begin (display-line "All objects in the game:")
+           (for-each print-description (everything))))
+
+  ;; every: (container -> boolean) -> (listof container)
+  ;; A list of all the objects from (everything) that satisfy
+  ;; the predicate.
+  (define (every predicate?)
+    (filter predicate? (everything)))
+
+  ;; print-every: (container -> boolean) -> void
+  ;; Prints all the objects satisfying predicate.
+  (define (print-every predicate?)
+    (for-each print-description (every predicate?)))
+
+  ;; check-containers: -> void
+  ;; Throw an exception if there is an thing whose location and
+  ;; container disagree with one another.
+  (define (check-containers!)
+    (for-each (λ (container)
+                (for-each (λ (thing)
+                            (unless (eq? (thing-location thing)
+                                         container)
+                              (error (description container)
+                                     " has "
+                                     (description thing)
+                                     " in its contents list but "
+                                     (description thing)
+                                     " has a different location.")))
+                          (container-contents container)))
+              (everything)))
+
+  ;; is-a?: object word -> boolean
+  ;; True if word appears in the description of the object
+  ;; or is the name of one of its types
+  (define (is-a? obj word)
+    (let* ((str (if (symbol? word)
+                    (symbol->string word)
+                    word))
+           (probe (name->type-predicate str)))
+      (if (eq? probe #f)
+          (member str (description-word-list obj))
+          (probe obj))))
+
+  ;; display-line: object -> void
+  ;; EFFECT: prints object using display, and then starts a new line.
+  (define (display-line what)
+    (begin (display what)
+           (newline)
+           (void)))
+
+  ;; words->string: (listof string) -> string
+  ;; Converts a list of one-word strings into a single string,
+  ;; e.g. '("a" "red" "door") -> "a red door"
+  (define (words->string word-list)
+    (string-append (first word-list)
+                   (apply string-append
+                          (map (λ (word)
+                                 (string-append " " word))
+                               (rest word-list)))))
+
+  ;; string->words: string -> (listof string)
+  ;; Converts a string containing words to a list of the individual
+  ;; words.  Inverse of words->string.
+  (define (string->words string)
+    (string-split string))
+
+  ;; add-a-or-an: (listof string) -> (listof string)
+  ;; Prefixes a list of words with "a" or "an", depending
+  ;; on whether the first word in the list begins with a
+  ;; vowel.
+  (define (add-a-or-an word-list)
+    (local [(define first-word (first word-list))
+            (define first-char (substring first-word 0 1))
+            (define starts-with-vowel? (string-contains? first-char "aeiou"))]
+      (cons (if starts-with-vowel?
+                "an"
+                "a")
+            word-list)))
+
+  ;;
+  ;; The following calls are filling in blanks in the other files.
+  ;; This is needed because this file is in a different langauge than
+  ;; the others.
+  ;;
+  (set-find-the! find-the)
+  (set-find-within! find-within)
+  (set-restart-game! (λ () (start-game)))
+  (define (game-print object)
+    (cond [(void? object)
+           (void)]
+          [(object? object)
+           (print-description object)]
+          [else (write object)]))
+
+  (current-print game-print)
+   
+  ;;;
+  ;;; Start it up
+  ;;;
+
+  (start-game)
+  (look)
+
+  
