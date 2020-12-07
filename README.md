@@ -13,7 +13,7 @@ differently.
 
 Various procedures used in the game:
 
-(viewroom) : gives an analysis of each room with each item in the room 
+(viewroom) : gives an analysis of the room the player is currently in with a list of each item in the room 
 (descriptions input) : takes an object as an input and returns a description of that object
 (viewchest) : allows you to open the chest and view its contents
 (enter input) : takes a location as an input and allows you to enter that area only if they are adjoining 
