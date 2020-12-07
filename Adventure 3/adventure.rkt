@@ -356,7 +356,7 @@
   (make-room "last cave in the cave system" "cave3" (list "gold" "cave2")))
   
  (define gold
- (make-room "gold is more effective than diamond but breaks quickly" "gold"))
+ (make-object "gold is more effective than diamond but breaks quickly" "gold"))
 
 ;;initializes the value for current room
 (define currentroom
