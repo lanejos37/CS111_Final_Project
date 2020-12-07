@@ -7,7 +7,7 @@ Our code is written a little different than the starter code so the commands may
 For any assistance on the available precedures, the (actions) procedure is always available to give you in-game instructions 
 
 The goal of the game is to defeat the ender dragon located in the end world. This goal can be accomplished using the (win) walkthrough which will guide you directly
-to defeating the ender dragon. However, with the use of random variables, each playthrough is a different experience and you may or amy not end up defeating the 
+to defeating the ender dragon. However, with the use of random variables, each playthrough is a different experience and you may or may not end up defeating the 
 ender dragon on your first attempt. Without spoiling too much of the game, there are multiple worlds for you to discover and each adventure may end a little 
 differently.
 
