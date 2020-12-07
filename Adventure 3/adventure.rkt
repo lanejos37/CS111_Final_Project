@@ -289,7 +289,7 @@
  (define (update-healthbar x)
          (if (< (- (health-number healthbar) x)  0)
              (error "your healthbar has reached zero you are dead")
-             (set! healthbar (make-health "The amount of health you have left, if your health bar reaches zero then you die." (- (health-number healthbar) x)))))
+             (set! healthbar (make-health "The amount of health you have left, if your health bar reaches zero then you die." "healthbar" (- (health-number healthbar) x)))))
              
  (define viewhealthbar
       (health-number healthbar))
@@ -374,14 +374,14 @@
 (define zombie_pigman2
   (make-zombie_pigman "Is it a zombie or a pig??" "zombie_pigman_2"))
       
-(define-struct (creepers mobs)
+(define-struct (creeper mobs)
   ()
   #:methods
-  (define (attack_creeper)
-    (begin (destroy! creeper) (update-healthbar 8))))
+  (define (attack_creeper c)
+    (begin (remove '("creeper") (room-viewroom cave1)) (update-healthbar 8))))
 
-(define creeper
-  (make-creepers "makes a hissing noice when you come close" "creeper"))
+(define creeper1
+  (make-creeper "makes a hissing noice when you come close" "creeper"))
   
 (define-struct (enderdragons mobs)
 (fly fireballdamage clawdamage))
@@ -477,28 +477,6 @@
   "Throws an exception if condition is false.")
 
 
-(define (start-game)
-  (local [(define home (new-room "your own underground home where your adventure begins!"))
-          (define cave1 (new-room "first cave in the cave system you have entered"))
-          (define netherportal (new-room "netherportal takes you to the nether"))
-          ]
-    (begin (set! me (new-person "" home))
-           (join! home "your own underground home where your adventure begins!"
-                  cave1 "first cave in the cave system you have entered")
-           (new-prop "banana" "its a banana" cave1)
-           (void))))
-
-(define-walkthrough walkthrough
-  (go (the door))
-  (take (the banana))
-  (inventory)
-  (check (have? (the banana)))
-  (go (the door))
-  (drop (the banana))
-  (check (not (have? (the banana))))
-  (look)
-  (inventory)
-  (check (room? (thing-location (the banana)))))
 
 ;;;
 ;;; ADD YOUR COMMANDS HERE!
@@ -711,21 +689,3 @@
 ;; This is needed because this file is in a different langauge than
 ;; the others.
 ;;
-(set-find-the! find-the)
-(set-find-within! find-within)
-(set-restart-game! (λ () (start-game)))
-(define (game-print object)
-  (cond [(void? object)
-         (void)]
-        [(object? object)
-         (print-description object)]
-        [else (write object)]))
-
-(current-print game-print)
-   
-;;;
-;;; Start it up
-;;;
-
-(start-game)
-(look)
