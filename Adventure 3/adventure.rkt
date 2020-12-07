@@ -328,11 +328,15 @@
 
 ;;cave you can enter
 (define cave1
-  (make-room "first cave in the cave system you have entered" "cave1" (list "creeper" "netherportal")))
+  (make-room "first cave in the cave system you have entered" "cave1" (list "creeper" "home""netherportal""the_end")))
 
 ;;netherportal takes you take nether
 (define netherportal
-  (make-room "netherportal takes you to the nether" "netherportal" (list "zombie_pigman" "zombie_pigman2")))
+  (make-room "netherportal takes you to the nether" "netherportal" (list "zombie_pigman" "zombie_pigman2""cave_1")))
+
+;;the_end were you can win the game
+(define the_end
+  (make-room "the_end a world were you can fight the enderdragon to win the game" "the_end" (list "enderdragon" "cave1")))
 
 ;;initializes the value for current room
 (define currentroom
