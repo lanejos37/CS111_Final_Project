@@ -1,6 +1,6 @@
 # CS111_Final_Project
 
-To start the game write the procedure "(start-game)"
+To start the game press the run button in racket or write the procedure "(start-game)"
 
 Our code is written a little different than the starter code so the commands may be written slightly differently
 
