@@ -342,9 +342,18 @@
 (define cave2
 (make-room "second room in the cave system" "cave2" (list "diamonds" "coal" "cave1")))
 
+(define coal
+(make-object "coal is good for fires!" "coal"))
+
+(defone diamonds
+(make-object "highly valuable resource! "diamonds"))
+
 ;;cave_3
   (define cave3
   (make-room "last cave in the cave system" "cave3" (list "gold" "cave2")))
+  
+ (define gold
+ (make-room "gold is more effective than diamond but breaks quickly" "gold"))
 
 ;;initializes the value for current room
 (define currentroom
