@@ -324,7 +324,7 @@
 
 ;;room you start in
 (define home
-  (make-room "your own underground home where your adventure begins!" "home" (list "chest" "cave1")))
+  (make-room "your own underground home where your adventure begins!" "home" (list "home-chest" "cave1")))
 
 ;;cave you can enter
 (define cave1
