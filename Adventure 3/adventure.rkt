@@ -366,7 +366,7 @@
 ()
 #:methods
 (define (attack_pigman a)
-  (begin (destroy! a) (update-healthbar 4))))
+  (begin (destroy! a) (update-healthbar 4)(display "zombie pigman has been killed"))))
   
 (define zombie_pigman1
   (make-zombie_pigman "Is it a zombie or a pig??" "zombie_pigman1"))
@@ -378,7 +378,7 @@
   ()
   #:methods
   (define (attack_creeper c)
-    (begin (remove '("creeper") (room-viewroom cave1)) (update-healthbar 8))))
+    (begin (remove '("creeper") (room-viewroom cave1)) (update-healthbar 8)(display "creeper has been killed"))))
 
 (define creeper
   (make-creepers "makes a hissing noice when you come close" "creeper"))
