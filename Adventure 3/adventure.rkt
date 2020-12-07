@@ -402,8 +402,7 @@
         (if (< (random) 0.8)
                (begin (update-healthbar (enderdragons-clawdamage enderdragon))
                (display "you have taken damage from the dragon's claw attack"))
-               (begin (destroy! x)
-                       (display "you have killed the enderdragon and won the game!"))))))
+               (begin (display "you have killed the enderdragon and won the game!"))))))
 
 
 
