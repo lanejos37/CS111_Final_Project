@@ -328,7 +328,7 @@
 
 ;;cave you can enter
 (define cave1
-  (make-room "first cave in the cave system you have entered" "cave1" (list "creeper" "home""netherportal""the_end")))
+  (make-room "first cave in the cave system you have entered" "cave1" (list "creeper" "home""netherportal""the_end""cave_2")))
 
 ;;netherportal takes you take nether
 (define netherportal
@@ -337,6 +337,10 @@
 ;;the_end were you can win the game
 (define the_end
   (make-room "the_end a world were you can fight the enderdragon to win the game" "the_end" (list "enderdragon" "cave1")))
+  
+;;cave_2
+(define cave2
+(make-room "second room in the cave system" "cave2" (list "diamonds" "coal" "cave1"))
 
 ;;initializes the value for current room
 (define currentroom
