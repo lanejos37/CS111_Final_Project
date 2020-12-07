@@ -370,7 +370,7 @@
 ()
 #:methods
 (define (attack_pigman a)
-  (begin (remove (list "zombie_pigman") (room-viewroom netherportal)) (update-healthbar 4))))
+  (begin (remove (list "zombie_pigman") (room-viewroom netherportal)) (update-healthbar 3)(display "you have killed the zombie pigman and have taken 3 hearts of damage")))
   
 (define zombie_pigman1
   (make-zombie_pigman "Is it a zombie or a pig??" "zombie_pigman1"))
