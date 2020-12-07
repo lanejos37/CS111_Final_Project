@@ -325,6 +325,20 @@
 (define home-chest
 (make-chest "your safe chest in your home" "home-chest" (list "gold sword" "iron helmet" "4x diamonds" "diamond pickaxe" "stone shovel" "64x cobblestone")))
 
+(define gold_sword
+(make-object "very fragile weapon" "gold_sword"))
+
+(define iron_helmet
+(make-object "protective piece of headwear" "iron_helmet"))
+(define 4x_diamonds
+(make-object "valuable resources" "4x_diamonds"))
+(define diamond_pickaxe
+(make-object "very durable tool" "diamond_pickaxe"))
+(define stone_shovel
+(make-object "decent starter tool" "stone_shovel"))
+(define 64x_cobblestone
+(make-object "garbage" "64x_cobblestone"))
+
 ;;room you start in
 (define home
   (make-room "your own underground home where your adventure begins!" "home" (list "home-chest" "cave1")))
