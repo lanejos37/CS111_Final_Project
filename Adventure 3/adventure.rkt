@@ -526,6 +526,11 @@
 ;;; PUT YOUR WALKTHROUGHS HERE
 ;;;
 
+(define win
+  (begin (enter cave1)
+  (begin (enter the_end)
+  (begin (attack_enderdragon enderdragon))))
+)
 
 
 
