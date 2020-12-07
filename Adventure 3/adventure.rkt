@@ -340,11 +340,11 @@
   
 ;;cave_2
 (define cave2
-(make-room "second room in the cave system" "cave2" (list "diamonds" "coal" "cave1"))
+(make-room "second room in the cave system" "cave2" (list "diamonds" "coal" "cave1")))
 
 ;;cave_3
-  (define cave2
-  (make-room "last cave in the cave system" "cave3" (list "gold" "cave2"))
+  (define cave3
+  (make-room "last cave in the cave system" "cave3" (list "gold" "cave2")))
 
 ;;initializes the value for current room
 (define currentroom
