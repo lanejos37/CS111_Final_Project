@@ -9,7 +9,7 @@
 
 ;; Displays all possible actions in the game
 (define (actions)
-  (display "descriptions takes an object as an input and outputs a description of the object.\n\nviewroom tells you everything within your cave.\n\nviewchest allows you to view a chest it takes no inputs.\n\nenter takes a location as an input and allows you to leave one area and enter another.\n\nattack_creeper takes no inputs and allows you to attack a creeper\n\nattack_pigman takes a zombie_pigman as input and allows you to attack the zombie_pigman\n\nattack_enderdragon takes an enderdragon as input and allows you to attack the enderdragon\n\nviewhealthbar shows you how much health you have out of ten in your healthbar(no parens)."))
+  (display "descriptions takes an object as an input and outputs a description of the object.\n\nviewroom tells you everything within your cave.\n\nviewchest allows you to view a chest it takes no inputs.\n\nenter takes a location as an input and allows you to leave one area and enter another.\n\nattack_creeper takes a creeper as input and allows you to attack a creeper\n\nattack_pigman takes a zombie_pigman as input and allows you to attack the zombie_pigman\n\nattack_enderdragon takes an enderdragon as input and allows you to attack the enderdragon\n\nviewhealthbar shows you how much health you have out of ten in your healthbar(no parens)."))
 
 
 
