@@ -21,3 +21,5 @@ Various procedures used in the game:
 (attack_creeper input) : attacks the creeper with the creeper as the input
 (attack_pigman input) : attacks the zombie-pigman with the zombie-pigman as the input
 (attack_enderdragon input) : attacks the enderdragon with the enderdragon as the input
+
+ALSO THE MOBS RESPAWNING IS A FEATURE TOTALLY NOT A BUG!
