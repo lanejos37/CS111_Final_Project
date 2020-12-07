@@ -5,7 +5,7 @@
 
 
 ;; Initial message display at the start of the game
-(display "You are playing minecraft and are going through caves. You are currently in your underground room and are going to explore the cave system you just found next to your place.\nUse the actions procedure to see what actions are possible.")
+(display "You are playing minecraft and are going through caves. You are currently in your underground room and are going to explore the cave system you just found next to your place.\nUse the actions procedure to see what actions are possible. If you choose to try to win the game you can do so by defeating the enderdragon.")
 
 ;; Displays all possible actions in the game
 (define (actions)
