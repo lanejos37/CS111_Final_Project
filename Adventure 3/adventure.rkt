@@ -7,6 +7,9 @@
 ;; Initial message display at the start of the game
 (display "You are playing minecraft and are going through caves. You are currently in your underground room and are going to explore the cave system you just found next to your place.\nUse the actions procedure to see what actions are possible. If you choose to try to win the game you can do so by defeating the enderdragon.")
 
+(define (start-game)
+(display "You are playing minecraft and are going through caves. You are currently in your underground room and are going to explore the cave system you just found next to your place.\nUse the actions procedure to see what actions are possible. If you choose to try to win the game you can do so by defeating the enderdragon."))
+
 ;; Displays all possible actions in the game
 (define (actions)
   (display "descriptions takes an object as an input and outputs a description of the object.\n\nviewroom tells you everything within your cave.\n\nviewchest allows you to view a chest it takes no inputs.\n\nenter takes a location as an input and allows you to leave one area and enter another.\n\nattack_creeper takes a creeper as input and allows you to attack a creeper\n\nattack_pigman takes a zombie_pigman as input and allows you to attack the zombie_pigman\n\nattack_enderdragon takes an enderdragon as input and allows you to attack the enderdragon\n\nviewhealthbar shows you how much health you have out of ten in your healthbar."))
