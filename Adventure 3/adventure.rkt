@@ -284,10 +284,10 @@
 
 
   (define healthbar
-  (make-health "The amount of health you have left, if your health bar reaches zero then you die." "healthbar" 10))
+  (make-health "The amount of health you have left, if your health bar reaches zero then you die." "healthbar" 15))
 
  (define (update-healthbar x)
-         (if (< (- (health-number healthbar) x)  0)
+         (if (<= (- (health-number healthbar) x)  0)
              (error "your healthbar has reached zero you are dead")
              (set! healthbar (make-health "The amount of health you have left, if your health bar reaches zero then you die." "healthbar" (- (health-number healthbar) x)))))
              
