@@ -335,7 +335,7 @@
 
 ;;netherportal takes you take nether
 (define netherportal
-  (make-room "netherportal takes you to the nether" "netherportal" (list "zombie_pigman" "zombie_pigman2""cave1")))
+  (make-room "netherportal takes you to the nether" "netherportal" (list "zombie_pigman1" "zombie_pigman2""cave1")))
 
 ;;the_end were you can win the game
 (define the_end
