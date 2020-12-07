@@ -323,7 +323,7 @@
 
 ;; chest in your room
 (define home-chest
-(make-chest "your safe chest in your home" "home-chest" (list "gold sword" "iron helmet" "4x diamonds" "diamond pickaxe" "stone shovel" "64x cobblestone")))
+(make-chest "your safe chest in your home" "home-chest" (list "gold_sword" "iron_helmet" "4x_diamonds" "diamond_pickaxe" "stone_shovel" "64x_cobblestone")))
 
 (define gold_sword
 (make-object "very fragile weapon" "gold_sword"))
