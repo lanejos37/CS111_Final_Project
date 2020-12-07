@@ -328,7 +328,7 @@
 
 ;;cave you can enter
 (define cave1
-  (make-room "first cave in the cave system you have entered" "cave1" (list "creeper1" "netherportal")))
+  (make-room "first cave in the cave system you have entered" "cave1" (list "creeper" "netherportal")))
 
 ;;netherportal takes you take nether
 (define netherportal
