@@ -291,7 +291,8 @@
              (error "your healthbar has reached zero you are dead")
              (set! healthbar (make-health "The amount of health you have left, if your health bar reaches zero then you die." (- (health-number healthbar) x)))))
              
-             
+ (define viewhealthbar
+      (health-number healthbar))
              
              
              
