@@ -382,7 +382,7 @@
   ()
   #:methods
   (define (attack_creeper c)
-    (begin (remove '("creeper") (room-viewroom cave1)) (update-healthbar 8)(display "creeper has been killed"))))
+    (begin (remove '("creeper") (room-viewroom cave1)) (update-healthbar 8)(display "creeper has been killed and you have taken 8 hearts of damage from the explosion"))))
 
 (define creeper
   (make-creepers "makes a hissing noice when you come close" "creeper"))
