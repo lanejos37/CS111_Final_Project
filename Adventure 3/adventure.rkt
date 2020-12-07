@@ -374,14 +374,14 @@
 (define zombie_pigman2
   (make-zombie_pigman "Is it a zombie or a pig??" "zombie_pigman_2"))
       
-(define-struct (creeper mobs)
+(define-struct (creepers mobs)
   ()
   #:methods
   (define (attack_creeper c)
     (begin (remove '("creeper") (room-viewroom cave1)) (update-healthbar 8))))
 
-(define creeper1
-  (make-creeper "makes a hissing noice when you come close" "creeper"))
+(define creeper
+  (make-creepers "makes a hissing noice when you come close" "creeper"))
   
 (define-struct (enderdragons mobs)
 (fly fireballdamage clawdamage))
