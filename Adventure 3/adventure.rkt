@@ -344,7 +344,7 @@
 ;;updates current room when you enter a new room
 (define (enter newroom)
   (if (ismember1? (object-name newroom) (room-viewroom currentroom))
-  (set! currentroom newroom)
+  (begin (set! currentroom newroom) (display "you have entered a new room"))
   (display "Cannot enter a non-adjacent room")))
 
 
