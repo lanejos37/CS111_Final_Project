@@ -349,7 +349,7 @@
 (make-object "coal is good for fires!" "coal"))
 
 (defone diamonds
-(make-object "highly valuable resource! "diamonds"))
+(make-object "highly valuable resource!" "diamonds"))
 
 ;;cave_3
   (define cave3
