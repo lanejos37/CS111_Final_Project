@@ -526,12 +526,11 @@
 ;;; PUT YOUR WALKTHROUGHS HERE
 ;;;
 
-(define win
+(define-walkthrough win
   (begin (enter cave1)
   (begin (enter the_end)
   (begin (attack_enderdragon enderdragon))))
 )
-
 
 
 
