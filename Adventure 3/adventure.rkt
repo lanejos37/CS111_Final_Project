@@ -54,7 +54,9 @@
 (define (descriptions a)
     (if (ismember1? (object-name a) (room-viewroom currentroom))
     (object-adjectives a)
-    (display "Cannot observe object that is not in your room")))
+    (if (ismember1? (object-name a) (chest-viewchest home-chest))
+    (object-adjectives a)
+    (display "Cannot observe object that is not in your room"))))
   (define(objectlist a)
     (type-name-string a)))
            
